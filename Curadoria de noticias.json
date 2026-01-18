@@ -1,0 +1,295 @@
+{
+  "name": "Curadoria de noticias",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6,
+              "triggerAtMinute": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        -16
+      ],
+      "id": "415f6488-c46b-4abb-9d57-f5ad8b6108ea",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://dev.to/feed/tag/ai",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -112,
+        -80
+      ],
+      "id": "f317c660-ad2c-4355-9a8b-ad18f09a0eb9",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "url": "https://ge.globo.com/ESP/Noticia/Rss/0,,AS0-4401,00.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -112,
+        64
+      ],
+      "id": "2a6e73fa-28a8-4837-b0db-ec27a137ec49",
+      "name": "RSS Read1"
+    },
+    {
+      "parameters": {
+        "maxItems": 2
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        48,
+        -80
+      ],
+      "id": "a6b384dc-9ced-4c42-a8f2-93baa02f30c8",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "maxItems": 2
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        48,
+        64
+      ],
+      "id": "40fca580-3493-4423-a459-b1d278ce2d1d",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        368,
+        -16
+      ],
+      "id": "966c3424-4cbb-4e0e-b2e6-7ba751a2e3cc",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "title, content, link",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        576,
+        -16
+      ],
+      "id": "f4b1758f-528c-4df1-b281-d8405602e9ed",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "posts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        784,
+        -16
+      ],
+      "id": "d6a8524a-9936-4390-9ca9-342f335afe88",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Você é um editor de notícias de tecnologia especializado em Inteligência Artificial (IA) e Tecnologia. \\n\\nSua tarefa é analisar o conjunto de notícias a seguir, extrair apenas os pontos mais relevantes e criar um resumo diário.\\n\\nInstruções de Saída:\\n\\nFormato: A saída deve ser uma única mensagem formatada com títulos em Markdown (negrito e emojis) para fácil leitura.\\n\\nConteúdo: Selecione no máximo 3 notícias mais importantes e relevantes para desenvolvedores.\\n\\nEstrutura: Divida a mensagem em três seções: Título, IA & ML, e Tecnologia.\\n\\nResumo: Para cada notícia selecionada, crie um resumo conciso de no máximo 50 palavras.\\n\\nLinks: O Título de cada resumo deve ser o link original da notícia (se possível, use a sintaxe Markdown para links: [Título Original](URL do Artigo)).\\n\\nEstrutura de Saída Desejada:\\n\\nMarkdown\\n\\n🤖 **Resumo Diário de Notícias Tech** 🚀\\n*Data atual* {{ $now.format('dd/MM/yy') }}\\n\\n---\\n\\n🧠 **Inteligência Artificial & Machine Learning**\\n\\n1️⃣ **[Título do Artigo IA 1](URL do Artigo 1)**\\n* Breve resumo (máx. 50 palavras) sobre o avanço, modelo ou pesquisa.\\n\\n2️⃣ **[Título do Artigo IA 2](URL do Artigo 2)**\\n* Breve resumo (máx. 50 palavras) sobre novas ferramentas ou implicações éticas.\\n\\n---\\n\\n💻 **Tecnologia**\\n\\n1️⃣ **[Título do Artigo Tecnologia 1](URL do Artigo 3)**\\n* Breve resumo (máx. 50 palavras) sobre novo recurso, framework, ou release importante (ex: Node.js, React).\\n\\n---\\n\\n🔥 **Dica Rápida:** *Uma frase motivacional ou um breve lembrete sobre a importância de revisar a documentação.*\\nDados de Entrada (Artigos RSS):\\n\\n(Insira aqui os dados dos artigos coletados pelo nó RSS Read, após o pré-processamento, geralmente em formato JSON ou texto simples.)\\n\\nJSON\\n\\n[\\n  {\\n    \\\"title\\\": \\\"Título do Artigo 1\\\",\\n    \\\"url\\\": \\\"https://...\\\",\\n    \\\"content\\\": \\\"Conteúdo completo do artigo 1...\\\"\\n  },\\n  {\\n    \\\"title\\\": \\\"Título do Artigo 2\\\",\\n    \\\"url\\\": \\\"https://...\\\",\\n    \\\"content\\\": \\\"Conteúdo completo do artigo 2...\\\"\\n  },\\n  // ... mais artigos\\n]\\nEste prompt garante que a LLM:\\n\\nMantenha o Foco: Limita o resultado a apenas IA e JS/TS.\\n\\nSeja Concisa: Impede que a LLM crie resumos longos demais (limite de 50 palavras).\\n\\nFormate Corretamente: Entrega a saída pronta para o Markdown do Discord.\\n\\n\\nConjunto de notícias\\n{{ $json.posts.toJsonString() }}\""
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        992,
+        -16
+      ],
+      "id": "f0d7c5d9-b5ae-42c9-9f5e-bbd18c896258",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "fjcO0FFxf5H7YW9p",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ $json.content.parts[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        -16
+      ],
+      "id": "2e4a7e26-bbe0-456c-b699-aea0c77f2194",
+      "name": "Discord",
+      "webhookId": "19eef7a6-8418-4a7f-9f2d-e5c1348fd212",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "hltjSGJ8IRmY8llj",
+          "name": "Discord Webhook account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read1": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "f240cb01-6de1-43ab-9b09-65244aa73c18",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6d94556e44bcf4fedcbc970ba30ec313630a5530fab236f145d7d08ed72ff73b"
+  },
+  "id": "rmIav0BzaxAhunojRFy06",
+  "tags": []
+}
